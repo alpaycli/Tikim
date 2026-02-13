@@ -14,14 +14,21 @@ struct PrimaryButton<Label: View>: View {
     @Environment(\.backgroundStyle) private var backgroundStyle
     @Environment(\.isEnabled) var isEnabled
    
+   var width: CGFloat?
+   var height: CGFloat? = 44
+   
    @State private var triggerFeedback = false
         
     init(
+      width: CGFloat? = nil,
+      height: CGFloat? = nil,
         action: @escaping () -> Void,
         @ViewBuilder label: () -> Label
     ) {
         self.action = action
         self.label = label()
+       self.width = width
+       self.height = 44
     }
     
     var body: some View {
@@ -31,11 +38,20 @@ struct PrimaryButton<Label: View>: View {
         } label: {
             label
                 .containerRelativeFrame(.horizontal) { length, _ in
-                    length - 48
+                   width == nil ? length - 48 : length
                 }
-                .frame(height: 44)
-                .background(isEnabled ? backgroundStyle ?? AnyShapeStyle(Color.gray) : AnyShapeStyle(Color.gray.secondary))
-                .clipShape(.rect(cornerRadius: 8))
+                .frame(width: width, height: height)
+//                .background(isEnabled ? backgroundStyle ?? AnyShapeStyle(Color(hex: "#0750D0")) : AnyShapeStyle(Color(hex: "#F5F5F5")))
+//                .clipShape(.rect(cornerRadius: 8))
+//                .clipShape{
+//                   RoundedRectangle(cornerRadius: 8)
+//                      .stroke(Color(hex: "#E9EAEB"), lineWidth: isEnabled ? 0 : 1)
+//                }
+                .background {
+                   RoundedRectangle(cornerRadius: 8)
+                      .stroke(Color(hex: "#E9EAEB"), lineWidth: isEnabled ? 0 : 2)
+                      .fill(isEnabled ? backgroundStyle ?? AnyShapeStyle(Color(hex: "#0750D0")) : AnyShapeStyle(Color(hex: "#F5F5F5")))
+                }
                 .sensoryFeedback(.impact, trigger: triggerFeedback)
         }
     }

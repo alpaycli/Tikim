@@ -22,20 +22,12 @@ struct OnboardingView: View {
             
             VStack(spacing: 26) {
                PrimaryButton {
-                  if viewModel.currentIndex == viewModel.onboardingContent.count - 1 {
-                     // Navigate to next view
-                     
-                     
-                  } else {
-                     // Next onboarding card
-                     withAnimation { viewModel.goToNextStep() }
-                  }
+                  withAnimation { viewModel.goToNextStep() }
                } label: {
                   Text("Next")
                      .bold()
                      .foregroundStyle(.white)
                }
-               .backgroundStyle(AnyShapeStyle(Color(hex: "#0750D0")))
                
                
                SecondaryButton {
@@ -56,6 +48,9 @@ struct OnboardingView: View {
                .padding(.init(top: 24, leading: 24, bottom: 48, trailing: 24))
                .multilineTextAlignment(.center)
                .font(.system(size: 12))
+         }
+         .navigationDestination(isPresented: $viewModel.isFinished) {
+            LoginView()
          }
       }
    }

@@ -6,13 +6,30 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C9EACF382F3F032A00C00A69 /* iPhoneNumberField in Frameworks */ = {isa = PBXBuildFile; productRef = C9EACF372F3F032A00C00A69 /* iPhoneNumberField */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		C9C2B5372F3DBA3F00179220 /* Tikim.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tikim.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C9DDA5442F3F0C2000F561FB /* Exceptions for "Tikim" folder in "Tikim" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = C9C2B5362F3DBA3F00179220 /* Tikim */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C9C2B5392F3DBA3F00179220 /* Tikim */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C9DDA5442F3F0C2000F561FB /* Exceptions for "Tikim" folder in "Tikim" target */,
+			);
 			path = Tikim;
 			sourceTree = "<group>";
 		};
@@ -23,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C9EACF382F3F032A00C00A69 /* iPhoneNumberField in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +83,7 @@
 			);
 			name = Tikim;
 			packageProductDependencies = (
+				C9EACF372F3F032A00C00A69 /* iPhoneNumberField */,
 			);
 			productName = Tikim;
 			productReference = C9C2B5372F3DBA3F00179220 /* Tikim.app */;
@@ -94,6 +113,9 @@
 			);
 			mainGroup = C9C2B52E2F3DBA3F00179220;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C9EACF362F3F032A00C00A69 /* XCRemoteSwiftPackageReference "iPhoneNumberField" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C9C2B5382F3DBA3F00179220 /* Products */;
 			projectDirPath = "";
@@ -256,6 +278,7 @@
 				DEVELOPMENT_TEAM = G8MSA22VSU;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Tikim/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -289,6 +312,7 @@
 				DEVELOPMENT_TEAM = G8MSA22VSU;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Tikim/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -334,6 +358,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C9EACF362F3F032A00C00A69 /* XCRemoteSwiftPackageReference "iPhoneNumberField" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MojtabaHs/iPhoneNumberField.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.10.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C9EACF372F3F032A00C00A69 /* iPhoneNumberField */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C9EACF362F3F032A00C00A69 /* XCRemoteSwiftPackageReference "iPhoneNumberField" */;
+			productName = iPhoneNumberField;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C9C2B52F2F3DBA3F00179220 /* Project object */;
 }
