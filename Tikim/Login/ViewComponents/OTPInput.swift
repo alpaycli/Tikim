@@ -46,6 +46,11 @@ struct OTPInput: View {
                 .background {
                    RoundedRectangle(cornerRadius: 8, style: .continuous)
                       .stroke(focusedInput == index ? selectedFieldBorderColor : borderColor, lineWidth: 1)
+                      .shadow(
+                        color: Color(hex: "#0A0D1408").opacity(0.03),
+                        radius: 1,
+                        y: 1
+                      )
                    
                    if focusedInput == index {
                       RoundedRectangle(cornerRadius: 8, style: .continuous)

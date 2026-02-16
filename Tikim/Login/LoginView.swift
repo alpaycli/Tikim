@@ -9,31 +9,67 @@ import iPhoneNumberField
 import SwiftUI
 
 struct LoginView: View {
-   @State var text: String = ""
+   @State var phoneNumber: String = ""
    @State var isEditing: Bool = false
    @State var navigateToOtpView = false
    
    @Environment(\.dismiss) private var dismiss
+   
+   @State private var wrongPhoneNumberFormat = false
 
     var body: some View {
        VStack {
-          let placeholder = Text("(+994)").bold()
-          iPhoneNumberField("\(placeholder) 000-0000", text: $text, isEditing: $isEditing)
-//                   .flagHidden(false)
-//                   .flagSelectable(true)
-                   .font(UIFont(size: 14, weight: .regular))
-                   .maximumDigits(10)
-                   .foregroundColor(Color.pink)
-                   .clearButtonMode(.whileEditing)
-                   .onClear { _ in isEditing.toggle() }
-                   .accentColor(Color.orange)
-                   .padding()
-                   .background(Color.white)
-                   .cornerRadius(10)
-                   .shadow(color: isEditing ? Color.gray : .white, radius: 10)
-                   .padding()
+          VStack(spacing: 12) {
+             Image("person")
+                .resizable()
+                .scaledToFit()
+                .clipShape(.circle)
+                .frame(width: 64, height: 64)
+             
+             Text("Login to your account")
+                .foregroundStyle(Color(hex: "#171717"))
+                .font(.system(size: 24))
+          }
           
-          Button("Next") { navigateToOtpView = true }
+          VStack(alignment: .leading, spacing: 6) {
+             Text("Phone Number")
+             +
+             Text(verbatim: " *").foregroundStyle(Color(hex: "#0750D0"))
+                .foregroundStyle(Color(hex: "#414651"))
+             
+             VStack(alignment: .leading, spacing: 4) {
+                PhoneNumberField(phoneNumber: $phoneNumber, wrongFormat: $wrongPhoneNumberFormat)
+                if wrongPhoneNumberFormat {
+                   HStack(spacing: 6) {
+                      Image("error")
+                         .resizable()
+                         .scaledToFit()
+                         .frame(width: 12, height: 12)
+                      
+                      Text("Nömrə düzgün qeyd olunmayıb")
+                         .foregroundStyle(Color(hex: "#FB3748"))
+                         .font(.system(size: 12))
+                   }
+                }
+             }
+          }
+          .padding(.horizontal, 24)
+          .padding(.top, 32)
+          
+          PrimaryButton {
+             withAnimation { navigateToOtpView = true }
+          } label: {
+             Text("Continue")
+                .bold()
+                .foregroundStyle(.white)
+          }
+          .padding(.top, 24)
+          .disabled(wrongPhoneNumberFormat)
+          
+          Text("Enter details to login")
+             .foregroundStyle(Color(hex: "#5C5C5C"))
+             .font(.system(size: 16))
+             .padding(.top, 32)
        }
        .navigationDestination(isPresented: $navigateToOtpView) {
           OTPView()
@@ -53,107 +89,64 @@ struct LoginView: View {
        }
     }
 }
+struct PhoneNumberField: View {
+    @Binding var phoneNumber: String
+   @Binding var wrongFormat: Bool
+   
+   func formatPhoneNumber(input: String) -> String {
+        let digits = input.filter { $0.isNumber }
+        var result = ""
+        for (index, digit) in digits.prefix(9).enumerated() {
+            if index == 2 { result += " " }
+            if index == 5 { result += " " }
+            if index == 7 { result += " " }
+            result += String(digit)
+        }
+        return result
+    }
+    var body: some View {
+       HStack(spacing: 12) {
+           HStack(spacing: 8) {
+              Image("Azerbaijan-icon")
+                 .resizable()
+                 .scaledToFit()
+                 .frame(width: 20, height: 20)
+              
+              Text(verbatim: "AZE")
+                 .foregroundStyle(Color(hex: "#535862"))
+                 .font(.system(size: 16))
+           }
+            .padding(.leading, 14)
+           
+           HStack {
+              Text("+994")
+              TextField("00 000 00 00", text: $phoneNumber)
+              .keyboardType(.phonePad)
+              .onChange(of: phoneNumber) { _, newValue in
+                 phoneNumber = formatPhoneNumber(input: newValue)
+                 wrongFormat = phoneNumber.count < 12
+                 if newValue.count > 12 {
+                    phoneNumber = String(phoneNumber.prefix(12))
+                 }
+              }
+           }
+        }
+       .padding(.vertical, 12)
+       .background {
+          RoundedRectangle(cornerRadius: 8, style: .continuous)
+             .stroke(Color(hex: wrongFormat ? "#FB3748" : "#D5D7DA"), lineWidth: 1)
+             .shadow(
+               color: Color(hex: wrongFormat ? "#FB3748" : "#0A0D120D").opacity(0.05),
+               radius: 1,
+               y: 1
+             )
+       }
+    }
+}
+
 
 #Preview {
     NavigationStack{
        LoginView()
     }
-}
-
-struct OTPView: View {
-   /// User Input
-   @State private var numberCode = ""
-   /// Correct code coming from an api
-   @State private var correctCode = ""
-   
-   @State private var hasEnteredWrongCode = false
-   
-   @Environment(\.dismiss) private var dismiss
-   
-   
-   @State var ottpViewWidth: CGFloat = 0
-   
-   @FocusState var focusState: Bool
-   
-   var body: some View {
-      VStack {
-         Circle().frame(width: 64, height: 64)
-            .padding(.top, 29)
-            .padding(.bottom, 12)
-         
-         VStack(spacing: 4) {
-            Text("OTP Code")
-               .font(.system(size: 24, weight: .medium))
-            
-            Text("Enter the 6-digit code sent to your number")
-               .font(.system(size: 16))
-         }
-         .padding(.top, 12)
-
-         OTPInput(
-             text: $numberCode,
-             digitCount: 6,
-             numericOnly: true,
-             borderColor: Color(hex: hasEnteredWrongCode ? "#FB3748" : "#EBEBEB")
-         )
-         .padding(.top, 32)
-         .onGeometryChange(for: CGFloat.self) { proxy in
-            return proxy.frame(in: .global).width
-         } action: { newValue in
-             ottpViewWidth = newValue
-         }
-         
-         PrimaryButton(width: ottpViewWidth, height: 40) {
-            guard numberCode == correctCode else {
-               withAnimation {
-                  hasEnteredWrongCode = true
-               }
-               return
-            }
-            
-         } label: {
-            Text("Login")
-               .bold()
-               .foregroundStyle(numberCode.count < 6 ? Color(hex: "#A4A7AE") : .white)
-         }
-         .padding(.top, 34)
-         .disabled(numberCode.count < 6)
-         
-         VStack(spacing: 4) {
-            if hasEnteredWrongCode {
-               Text("OTP-kod yanlışdır.")
-                  .foregroundStyle(Color(hex: "#D92D20"))
-                  .font(.system(size: 14))
-            }
-            Text("Experiencing issue receiving the code?")
-               .foregroundStyle(.secondary)
-            
-            Button("Resend Code") {}
-               .underline()
-               .foregroundStyle(Color(hex: "#0355E3"))
-         }
-         .padding(.top, 24)
-         .font(.system(size: 14))
-         
-     
-      }
-      .navigationBarBackButtonHidden()
-      .toolbar {
-         ToolbarItem(placement: .topBarLeading) {
-            Button { dismiss() } label: {
-               Label("Back", systemImage: "chevron.left")
-                  .font(.system(size: 14))
-                  .foregroundStyle(Color(hex: "#5C5C5C"))
-               
-            }
-            .buttonStyle(.plain)
-            .labelStyle(.titleAndIcon)
-         }
-      }
-      .sensoryFeedback(.warning, trigger: hasEnteredWrongCode)
-   }
-}
-
-#Preview {
-   OTPView()
 }

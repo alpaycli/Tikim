@@ -31,16 +31,12 @@ struct OnboardingView: View {
                
                
                SecondaryButton {
-                  withAnimation {
-                     viewModel.goToPreviousStep()
-                  }
+                  viewModel.isFinished = true
                } label: {
-                  Text("Back")
+                  Text("Skip")
                      .bold()
                      .foregroundStyle(Color(hex: "#414651"))
-                     .opacity(viewModel.currentIndex == 0 ? 0.3 : 1)
                }
-               .disabled(viewModel.currentIndex == 0)
             }
             .padding(.top, 58)
             
@@ -61,20 +57,29 @@ struct OnboardingView: View {
 }
 
 struct AgreementTextView: View {
+   let attrStr: AttributedString = {
+      var result = AttributedString("By creating an account, you agree to our Terms of Service and Privacy Policy")
+      result.font = .system(size: 12)
+      result.foregroundColor = Color(hex: "#5C5C5C")
+      
+      if let range = result.range(of: "Terms of Service") {
+         result[range].link = URL(string: "https://qarabagh.com")
+         result[range].underlineStyle = .single
+         result[range].foregroundColor = Color(hex: "#171717")
+      }
+      
+      if let range = result.range(of: "Privacy Policy") {
+         result[range].link = URL(string: "https://www.newcastleunited.com/en")
+         result[range].underlineStyle = .single
+         result[range].foregroundColor = Color(hex: "#171717")
+         
+      }
+      
+      return result
+   }()
    var body: some View {
       Group {
-         let termsOfServiceBtn =   Text("Terms of Service")
-               .underline()
-         
-         
-         let privacyPolicyBtn = Button { } label: {
-            Text("Privacy Policy")
-               .underline()
-         }
-         
-         Text("By creating an account, you agree to our")
-         +
-         Text("Terms of Service").underline()
+         Text(attrStr)
       }
    }
 }

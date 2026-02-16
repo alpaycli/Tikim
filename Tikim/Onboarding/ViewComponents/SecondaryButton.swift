@@ -37,6 +37,11 @@ struct SecondaryButton<Label: View>: View {
                 .background(
                   RoundedRectangle(cornerRadius: 8)
                      .stroke(Color(hex: "#D5D7DA"), lineWidth: 2)
+                     .shadow(
+                       color: Color(hex: "#0A0D120D").opacity(0.05),
+                       radius: 1,
+                       y: 1
+                     )
                 )
                 .sensoryFeedback(.impact, trigger: triggerFeedback)
         }
