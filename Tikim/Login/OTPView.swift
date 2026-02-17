@@ -26,82 +26,25 @@ struct OTPView: View {
    
    var body: some View {
       VStack {
-         Image("otp")
-            .frame(width: 64, height: 64)
-            .padding(.top, 29)
+         headerView
          
-         VStack(spacing: 4) {
-            Text("OTP Code")
-               .font(.system(size: 24, weight: .medium))
-            
-            Text("Enter the 6-digit code sent to your number")
-               .font(.system(size: 16))
-         }
-         .padding(.top, 12)
-
-         OTPInput(
-             text: $numberCode,
-             digitCount: 6,
-             numericOnly: true,
-             borderColor: state.otpFieldBorderColor
-         )
-         .padding(.top, 32)
-         .onGeometryChange(for: CGFloat.self) { proxy in
-            return proxy.frame(in: .global).width
-         } action: { newValue in
-             ottpViewWidth = newValue
-         }
-         .onChange(of: numberCode) { _, new in print("new", new)}
+         otpInputView
+            .padding(.top, 32)
          
-         PrimaryButton(width: ottpViewWidth, height: 40) {
-            guard numberCode == correctCode else {
-               withAnimation {
-                  state = .wrongCode
-               }
-               return
-            }
-            
-            state = .correctCode
-            
-         } label: {
-            Text("Login")
-               .bold()
-               .foregroundStyle(numberCode.count < 6 ? Color(hex: "#A4A7AE") : .white)
-         }
-         .padding(.top, 34)
-         .disabled(numberCode.count < 6)
+         primaryButton
+            .padding(.top, 34)
          
          VStack(spacing: 4) {
             if state == .wrongCode {
-               Text("OTP-kod yanlışdır.")
-                  .foregroundStyle(Color(hex: "#D92D20"))
-                  .font(.system(size: 14))
+               wrongCodeTextView
             }
-            Text("Experiencing issue receiving the code?")
-               .foregroundStyle(.secondary)
-            
-            Button("Resend Code") {}
-               .underline()
-               .foregroundStyle(Color(hex: "#0355E3"))
+            resendCodeView
          }
-         .padding(.top, 24)
          .font(.system(size: 14))
-         
-     
+         .padding(.top, 24)
       }
       .navigationBarBackButtonHidden()
-      .toolbar {
-         ToolbarItem(placement: .topBarLeading) {
-            Button { dismiss() } label: {
-               Label("Back", systemImage: "chevron.left")
-                  .font(.system(size: 14))
-                  .foregroundStyle(Color(hex: "#5C5C5C"))
-               
-            }
-            .buttonStyle(.plain)
-            .labelStyle(.titleAndIcon)
-         }
-      }
+      .toolbar { toolbarBackButton }
       .sensoryFeedback(.warning, trigger: state == .wrongCode)
    }
    
@@ -119,6 +62,86 @@ struct OTPView: View {
             case .correctCode:
                Color.green
          }
+      }
+   }
+}
+
+extension OTPView {
+   private var headerView: some View {
+      VStack {
+         Image("otp")
+            .frame(width: 64, height: 64)
+            .padding(.top, 29)
+         
+         VStack(spacing: 4) {
+            Text("OTP Code")
+               .font(.system(size: 24, weight: .medium))
+            
+            Text("Enter the 6-digit code sent to your number")
+               .font(.system(size: 16))
+         }
+         .padding(.top, 12)
+      }
+   }
+   
+   private var otpInputView: some View {
+      OTPInput(
+         text: $numberCode,
+         digitCount: 6,
+         numericOnly: true,
+         borderColor: state.otpFieldBorderColor
+      )
+      .onGeometryChange(for: CGFloat.self) { proxy in
+         return proxy.frame(in: .global).width
+      } action: { newValue in
+         ottpViewWidth = newValue
+      }
+   }
+   
+   private var primaryButton: some View {
+      PrimaryButton(width: ottpViewWidth, height: 40) {
+         withAnimation {
+            guard numberCode == correctCode else {
+               state = .wrongCode
+               return
+            }
+            state = .correctCode
+         }
+      } label: {
+         Text("Login")
+            .bold()
+            .foregroundStyle(numberCode.count < 6 ? Color(hex: "#A4A7AE") : .white)
+      }
+      .disabled(numberCode.count < 6)
+   }
+   
+   private var resendCodeView: some View {
+      VStack {
+         Text("Experiencing issue receiving the code?")
+            .foregroundStyle(.secondary)
+         
+         Button("Resend Code") {}
+            .underline()
+            .foregroundStyle(Color(hex: "#0355E3"))
+      }
+   }
+   
+   private var wrongCodeTextView: some View {
+      Text("OTP-kod yanlışdır.")
+         .foregroundStyle(Color(hex: "#D92D20"))
+         .font(.system(size: 14))
+   }
+   
+   private var toolbarBackButton: some ToolbarContent {
+      ToolbarItem(placement: .topBarLeading) {
+         Button { dismiss() } label: {
+            Label("Back", systemImage: "chevron.left")
+               .font(.system(size: 14))
+               .foregroundStyle(Color(hex: "#5C5C5C"))
+            
+         }
+         .buttonStyle(.plain)
+         .labelStyle(.titleAndIcon)
       }
    }
 }
