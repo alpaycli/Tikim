@@ -15,6 +15,9 @@ class OnboardingViewModel {
    // To trigger navigation
    var isFinished = false
    
+   var isMovingForward = false
+   var currentTitle = ""
+   var currentSubtitle = ""
    var currentIndex = 0
    var currentModel: OnboardingDataModel {
       onboardingContent[currentIndex]

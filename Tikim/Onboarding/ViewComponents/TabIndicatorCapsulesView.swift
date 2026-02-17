@@ -22,9 +22,7 @@ struct TabIndicatorCapsulesView: View {
                   width: index == currentTab ? 18 : 6,
                   height: 6
                )
-               .opacity(index == currentTab ? 1 : 0.3)
-//               .animation(.easeInOut(duration: 0.3), value: index == currentTab)
-            
+               .opacity(index == currentTab ? 1 : 0.3)            
          }
       }
    }

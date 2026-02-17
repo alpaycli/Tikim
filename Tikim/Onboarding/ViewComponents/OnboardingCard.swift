@@ -10,10 +10,28 @@ import SwiftUI
 struct OnboardingCard: View {
    @Bindable var viewModel: OnboardingViewModel
    @State private var visibleTab: Int = 0         // actually shown
+   
+//   private var customTransition: AnyTransition {
+//       let moveTop = AnyTransition.move(edge: .top)
+//         .combined(with: .opacity)
+//      let moveBottom = AnyTransition.move(edge: .bottom)
+//           .combined(with: .opacity)
+//       
+//       // Asymmetric transition uses different logic for in/out
+//      return viewModel.isMovingForward ? moveBottom : moveTop
+//   }
+   
+   private var customTransition: AnyTransition {
+      let insertion = viewModel.isMovingForward ? AnyTransition.move(edge: .bottom) : AnyTransition.move(edge: .top)
+//      let removal = AnyTransition.move(edge: viewModel.isMovingForward ? .top : .bottom)
+       
+       // Asymmetric transition uses different logic for in/out
+      return insertion.combined(with: .opacity)
+   }
 
    var body: some View {
       ZStack {
-         TabView(selection: $viewModel.currentIndex.animation()) {
+         TabView(selection: $viewModel.currentIndex.animation(.easeInOut(duration: 0.2))) {
             ForEach(viewModel.onboardingContent.indices, id: \.self) { index in
                Image(viewModel.onboardingContent[index].imageName)
                   .resizable()
@@ -28,19 +46,8 @@ struct OnboardingCard: View {
          
          VStack {
             VStack(alignment: .leading, spacing: 14) {
-               switch visibleTab {
-                  case 0: titleView
-                  case 1: titleView
-                  case 2: titleView
-                  default: EmptyView()
-               }
-               
-               switch visibleTab {
-                  case 0: subtitleView
-                  case 1: subtitleView
-                  case 2: subtitleView
-                  default: EmptyView()
-               }
+               titleView
+               subtitleView
             }
 //            .animation(.easeInOut, value: viewModel.currentIndex)
             .padding(.init(top: 14, leading: 14, bottom: 0, trailing: 14))
@@ -55,16 +62,29 @@ struct OnboardingCard: View {
          
          Spacer()
       }
-      .onChange(of: viewModel.currentIndex) { _, newValue in
+      .task {
+         viewModel.currentTitle = viewModel.onboardingContent[0].title
+         viewModel.currentSubtitle = viewModel.onboardingContent[0].subtitle
+      }
+      .onChange(of: viewModel.currentIndex) { oldValue, newValue in
+         
+      
           // 1️⃣ animate removal
           withAnimation(.easeInOut(duration: 0.2)) {
               visibleTab = -1   // or some empty placeholder
+             viewModel.currentTitle = ""
+             viewModel.currentSubtitle = ""
           }
 
           // 2️⃣ delay insertion
-         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-              withAnimation(.easeInOut(duration: 0.1)) {
+         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+              withAnimation(.easeInOut(duration: 0.2)) {
                   visibleTab = newValue
+                 
+                 viewModel.isMovingForward = oldValue < newValue
+                 print(viewModel.isMovingForward ? "moving forward" : "moving back")
+                 viewModel.currentTitle = viewModel.onboardingContent[newValue].title
+                 viewModel.currentSubtitle = viewModel.onboardingContent[newValue].subtitle
               }
           }
       }
@@ -72,44 +92,33 @@ struct OnboardingCard: View {
    }
    
    private var titleView: some View {
-      Text(viewModel.currentModel.title)
+      Text(viewModel.currentTitle)
          .font(.system(size: 32))
          .fontWeight(.bold)
          .foregroundStyle(.white)
-         .id(viewModel.currentIndex) // important
-//                  .contentTransition(.numericText())
-         .transition(
-            .asymmetric(
-               insertion:
-                     .offset(y: 20)
-               ,
-               removal:
-                     .offset(y: -50)
-//                     .animation(.easeOut(duration: 9))
-                  .combined(with: .opacity.animation(.easeInOut(duration: 0.3)))
-            )
-         )
+         .id(visibleTab) // important
+         .transition(customTransition)
+//         .transition(
+//            .asymmetric(
+//               insertion: viewModel.isMovingForward ? .move(edge: .bottom) : .move(edge: .top),
+//               removal: viewModel.isMovingForward ? .move(edge: .bottom) : .move(edge: .top)
+//            )
+//         )
 
    }
    
    private var subtitleView: some View {
-      Text(viewModel.currentModel.subtitle)
+      Text(viewModel.currentSubtitle)
          .font(.system(size: 16))
          .foregroundStyle(.white)
-//                  .contentTransition(.numericText())
-         .id(viewModel.currentIndex) // important
-         .transition(
-            .asymmetric(
-               insertion:
-                     .offset(y: 20)
-               ,
-               removal:
-                     .offset(y: -50)
-//                     .animation(.easeOut(duration: 9))
-                     .combined(with: .opacity.animation(.easeInOut(duration: 0.3)))
-            )
-         )
-
+         .id(visibleTab) // important
+         .transition(customTransition)
+//         .transition(
+//            .asymmetric(
+//               insertion: viewModel.isMovingForward ? .move(edge: .bottom) : .move(edge: .top),
+//               removal: viewModel.isMovingForward ? .move(edge: .bottom) : .move(edge: .top)
+//            )
+//         )
    }
 }
 
