@@ -21,29 +21,15 @@ struct OnboardingView: View {
             }
             
             VStack(spacing: 26) {
-               PrimaryButton {
-                  withAnimation { viewModel.goToNextStep() }
-               } label: {
-                  Text("Next")
-                     .bold()
-                     .foregroundStyle(.white)
-               }
-               
-               
-               SecondaryButton {
-                  viewModel.isFinished = true
-               } label: {
-                  Text("Skip")
-                     .bold()
-                     .foregroundStyle(Color(hex: "#414651"))
-               }
+               nextButton
+               skipButton
             }
             .padding(.top, 58)
             
             AgreementTextView()
-               .padding(.init(top: 24, leading: 24, bottom: 48, trailing: 24))
                .multilineTextAlignment(.center)
                .font(.system(size: 12))
+               .padding(.init(top: 24, leading: 24, bottom: 48, trailing: 24))
          }
          .navigationDestination(isPresented: $viewModel.isFinished) {
             LoginView()
@@ -52,34 +38,28 @@ struct OnboardingView: View {
    }
 }
 
-#Preview {
-   OnboardingView()
-}
-
-struct AgreementTextView: View {
-   let attrStr: AttributedString = {
-      var result = AttributedString("By creating an account, you agree to our Terms of Service and Privacy Policy")
-      result.font = .system(size: 12)
-      result.foregroundColor = Color(hex: "#5C5C5C")
-      
-      if let range = result.range(of: "Terms of Service") {
-         result[range].link = URL(string: "https://qarabagh.com")
-         result[range].underlineStyle = .single
-         result[range].foregroundColor = Color(hex: "#171717")
-      }
-      
-      if let range = result.range(of: "Privacy Policy") {
-         result[range].link = URL(string: "https://www.newcastleunited.com/en")
-         result[range].underlineStyle = .single
-         result[range].foregroundColor = Color(hex: "#171717")
-         
-      }
-      
-      return result
-   }()
-   var body: some View {
-      Group {
-         Text(attrStr)
+extension OnboardingView {
+   private var nextButton: some View {
+      PrimaryButton {
+         withAnimation { viewModel.goToNextStep() }
+      } label: {
+         Text("Next")
+            .bold()
+            .foregroundStyle(.white)
       }
    }
+   
+   private var skipButton: some View {
+      SecondaryButton {
+         viewModel.isFinished = true
+      } label: {
+         Text("Skip")
+            .bold()
+            .foregroundStyle(Color(hex: "#414651"))
+      }
+   }
+}
+
+#Preview {
+   OnboardingView()
 }
