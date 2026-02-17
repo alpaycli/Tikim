@@ -51,6 +51,10 @@ struct PrimaryButton<Label: View>: View {
                    RoundedRectangle(cornerRadius: 8)
                       .stroke(Color(hex: "#E9EAEB"), lineWidth: isEnabled ? 0 : 2)
                       .fill(isEnabled ? backgroundStyle ?? AnyShapeStyle(Color(hex: "#0750D0")) : AnyShapeStyle(Color(hex: "#F5F5F5")))
+                   
+                   RoundedRectangle(cornerRadius: 10)
+                      .inset(by: 2)
+                      .stroke(.white.opacity(0.12), lineWidth: 2)
                 }
                 .sensoryFeedback(.impact, trigger: triggerFeedback)
         }
@@ -84,4 +88,16 @@ extension PrimaryButton where Label == SwiftUI.Label<Text, Image> {
             }
         )
     }
+}
+
+#Preview {
+   PrimaryButton {
+      withAnimation {}
+   } label: {
+      Text("Continue")
+         .bold()
+         .foregroundStyle(.white)
+   }
+   .padding(.top, 24)
+
 }
