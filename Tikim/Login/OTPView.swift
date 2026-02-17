@@ -8,19 +8,21 @@
 import SwiftUI
 
 struct OTPView: View {
+   @Environment(\.dismiss) private var dismiss
+   @FocusState private var focusState: Bool
+   
    /// User Input
    @State private var numberCode = ""
    /// Correct code coming from an api
-   @State private var correctCode = "123 456"
+   @State private var correctCode = "123456"
    
-   @State private var hasEnteredWrongCode = false
-   
-   @Environment(\.dismiss) private var dismiss
+   @State private var state: ViewState = .codeNotEntered
    
    
+   // To adjust the button size relative to it.
+   // Because otp field doesn't have constant width, each rectangle/field
+   // has constant width, and their look vary on different screen sizes.
    @State var ottpViewWidth: CGFloat = 0
-   
-   @FocusState var focusState: Bool
    
    var body: some View {
       VStack {
@@ -41,7 +43,7 @@ struct OTPView: View {
              text: $numberCode,
              digitCount: 6,
              numericOnly: true,
-             borderColor: Color(hex: hasEnteredWrongCode ? "#FB3748" : "#EBEBEB")
+             borderColor: state.otpFieldBorderColor
          )
          .padding(.top, 32)
          .onGeometryChange(for: CGFloat.self) { proxy in
@@ -49,14 +51,17 @@ struct OTPView: View {
          } action: { newValue in
              ottpViewWidth = newValue
          }
+         .onChange(of: numberCode) { _, new in print("new", new)}
          
          PrimaryButton(width: ottpViewWidth, height: 40) {
             guard numberCode == correctCode else {
                withAnimation {
-                  hasEnteredWrongCode = true
+                  state = .wrongCode
                }
                return
             }
+            
+            state = .correctCode
             
          } label: {
             Text("Login")
@@ -67,7 +72,7 @@ struct OTPView: View {
          .disabled(numberCode.count < 6)
          
          VStack(spacing: 4) {
-            if hasEnteredWrongCode {
+            if state == .wrongCode {
                Text("OTP-kod yanlışdır.")
                   .foregroundStyle(Color(hex: "#D92D20"))
                   .font(.system(size: 14))
@@ -97,7 +102,24 @@ struct OTPView: View {
             .labelStyle(.titleAndIcon)
          }
       }
-      .sensoryFeedback(.warning, trigger: hasEnteredWrongCode)
+      .sensoryFeedback(.warning, trigger: state == .wrongCode)
+   }
+   
+   private enum ViewState {
+      case codeNotEntered
+      case wrongCode
+      case correctCode
+      
+      var otpFieldBorderColor: Color {
+         switch self {
+            case .codeNotEntered:
+               Color(hex: "#EBEBEB")
+            case .wrongCode:
+               Color(hex: "#FB3748")
+            case .correctCode:
+               Color.green
+         }
+      }
    }
 }
 
