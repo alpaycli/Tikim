@@ -11,23 +11,25 @@ struct OnboardingCard: View {
    @Bindable var viewModel: OnboardingViewModel
    @State private var visibleTab: Int = 0         // actually shown
    
+   private var customTransition: AnyTransition {
+       let moveTop = AnyTransition.move(edge: .top)
+         .combined(with: .opacity)
+      let moveBottom = AnyTransition.move(edge: .bottom)
+           .combined(with: .opacity)
+      print("here here")
+       // Asymmetric transition uses different logic for in/out
+      return .asymmetric(
+         insertion: viewModel.isMovingForward ? moveBottom : moveTop,
+         removal: viewModel.isMovingForward ? moveTop : moveBottom
+      )
+   }
+   
 //   private var customTransition: AnyTransition {
-//       let moveTop = AnyTransition.move(edge: .top)
-//         .combined(with: .opacity)
-//      let moveBottom = AnyTransition.move(edge: .bottom)
-//           .combined(with: .opacity)
+//      let transition = viewModel.isMovingForward ? AnyTransition.move(edge: .bottom) : AnyTransition.move(edge: .top)
 //       
 //       // Asymmetric transition uses different logic for in/out
-//      return viewModel.isMovingForward ? moveBottom : moveTop
+//      return transition.combined(with: .opacity)
 //   }
-   
-   private var customTransition: AnyTransition {
-      let insertion = viewModel.isMovingForward ? AnyTransition.move(edge: .bottom) : AnyTransition.move(edge: .top)
-//      let removal = AnyTransition.move(edge: viewModel.isMovingForward ? .top : .bottom)
-       
-       // Asymmetric transition uses different logic for in/out
-      return insertion.combined(with: .opacity)
-   }
 
    var body: some View {
       ZStack {
@@ -66,8 +68,10 @@ struct OnboardingCard: View {
          viewModel.currentTitle = viewModel.onboardingContent[0].title
          viewModel.currentSubtitle = viewModel.onboardingContent[0].subtitle
       }
+      // For text transition animation
       .onChange(of: viewModel.currentIndex) { oldValue, newValue in
-         
+         viewModel.isMovingForward = oldValue < newValue
+         print(viewModel.isMovingForward)
       
           // 1️⃣ animate removal
           withAnimation(.easeInOut(duration: 0.2)) {
@@ -80,9 +84,6 @@ struct OnboardingCard: View {
          DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
               withAnimation(.easeInOut(duration: 0.2)) {
                   visibleTab = newValue
-                 
-                 viewModel.isMovingForward = oldValue < newValue
-                 print(viewModel.isMovingForward ? "moving forward" : "moving back")
                  viewModel.currentTitle = viewModel.onboardingContent[newValue].title
                  viewModel.currentSubtitle = viewModel.onboardingContent[newValue].subtitle
               }

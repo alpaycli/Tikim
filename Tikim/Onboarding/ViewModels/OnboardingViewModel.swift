@@ -19,6 +19,7 @@ class OnboardingViewModel {
    var currentTitle = ""
    var currentSubtitle = ""
    var currentIndex = 0
+   var previousIndex = 0
    var currentModel: OnboardingDataModel {
       onboardingContent[currentIndex]
    }
